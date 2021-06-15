@@ -25,12 +25,9 @@ SECRET_KEY = 'django-insecure-h2_jts@_pm969!@$@3_ig1)!3zynr7%yqeyowyr0m0hx!a^i)f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 import os
-ALLOWED_HOSTS = ['ec2-3-34-53-139.ap-northeast-2.compute.amazonaws.com', '3.34.53.139','*']
-# 생략 ... 
-TIME_ZONE = 'Asia/Seoul'
-# 생략 ...
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+ALLOWED_HOSTS = ['*']
+
+
 
 
 # Application definition
@@ -123,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
