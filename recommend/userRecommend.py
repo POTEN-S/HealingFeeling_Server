@@ -11,7 +11,8 @@ dir = db.reference('score').child('노래')
 #dir.update({'자동차':'기아'})
 print(dir.get())
 
-
+dir2 = db.reference('score').child('도서')
+print(dir2.get())
 #!/usr/bin/env python
 #coding: utf-8
 
