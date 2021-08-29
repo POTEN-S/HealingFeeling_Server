@@ -8,7 +8,9 @@ firebase_admin.initialize_app(cred,{
 })
 
 dir = db.reference('score').child('노래')
-#dir.update({'자동차':'기아'})
+dirbook = db.reference('score').child('도서')
+dirwhere = db.reference('score').child('장소')
+
 print(dir.get())
 
 
@@ -25,10 +27,21 @@ import pandas as pd
 dataset_df=pd.DataFrame(dir.get())
 dataset_df.fillna("Not Seen Yet",inplace=True)
 dataset_df
+
+dataset_df2=pd.DataFrame(dirbook.get())
+dataset_df2.fillna("Not Seen Yet",inplace=True)
+dataset_df2
+
+dataset_df3=pd.DataFrame(dirwhere.get())
+dataset_df3.fillna("Not Seen Yet",inplace=True)
+dataset_df3
 # In[36]:
 dataset=dir.get()
+datasetbook=dirbook.get()
+datasetwhere=dirwhere.get()
 
-def unique_items():
+print(dirbook.get())
+def unique_items_song(dataset):
     unique_items_list = []
     for person in dataset.keys():
         for items in dataset[person]:
@@ -37,11 +50,29 @@ def unique_items():
     unique_items_list=list(s)
     return unique_items_list
 
+def unique_items_book(dataset):
+    unique_items_list = []
+    for person in dataset.keys():
+        for items in dataset[person]:
+            unique_items_list.append(items)
+    s=set(unique_items_list)
+    unique_items_list=list(s)
+    return unique_items_list
 
+def unique_items_where(dataset):
+    unique_items_list = []
+    for person in dataset.keys():
+        for items in dataset[person]:
+            unique_items_list.append(items)
+    s=set(unique_items_list)
+    unique_items_list=list(s)
+    return unique_items_list
 # In[37]:
 
 
-unique_items()
+print(unique_items_song(dataset))
+print(unique_items_book(datasetbook))
+print(unique_items_where(datasetwhere))
 
 
 # In[61]:
@@ -51,7 +82,7 @@ unique_items()
 # custom function to create pearson correlation method from scratch
 import math
 
-def person_corelation(person1,person2):
+def person_corelation(dataset,person1,person2):
     both_rated = {}
     for item in dataset[person1]:
         if item in dataset[person2]:
@@ -82,10 +113,10 @@ def person_corelation(person1,person2):
         r = numerator_value / denominator_value
         return r
     
-def most_similar_users(target_person,no_of_users):
+def most_similar_users(dataset,target_person,no_of_users):
     
     # Used list comprehension for finding pearson similarity between users
-    scores = [(person_corelation(target_person,other_person),other_person) for other_person in dataset if other_person !=target_person]
+    scores = [(person_corelation(dataset,target_person,other_person),other_person) for other_person in dataset if other_person !=target_person]
     
     #sort the scores in descending order
     scores.sort(reverse=True)
@@ -93,13 +124,17 @@ def most_similar_users(target_person,no_of_users):
     #return the scores between the target person & other persons
     return scores[0:no_of_users]
 
-most_similar_users('97r9eGbBNIRiCUHZoEfbQIqioQ52',7)
+
+tp = 'CvOap2Q2t7MTe47zBxAvBpgFBTW2'
+most_similar_users(dataset,tp,len(dataset))
+most_similar_users(datasetbook,tp,len(datasetbook))
+most_similar_users(datasetwhere,tp,len(datasetwhere))
 
 
 # In[62]:
 
 
-def recommendation_phase(person):
+def recommendation_phase(dataset,person):
     # Gets recommendations for a person by using a weighted average of every other user's rankings
     totals = {}  #empty dictionary
     simSums = {} # empty dictionary
@@ -107,8 +142,7 @@ def recommendation_phase(person):
         # don't compare me to myself
         if other == person:
             continue
-        sim = person_corelation(person, other)
-
+        sim = person_corelation(dataset,person, other)
         # ignore scores of zero or lower
         if sim <= 0:
             continue
@@ -135,10 +169,14 @@ def recommendation_phase(person):
 
 print("Enter the target person")
 b=False
-tp = '97r9eGbBNIRiCUHZoEfbQIqioQ52'
+b2=False
+b3=False
+
 if tp in dataset.keys():
-    a=recommendation_phase(tp)
+    a=recommendation_phase(dataset,tp)
+    print(a)
     if a != -1:
+        print(a)
         print("Recommendation Using User based Collaborative Filtering:  ")
         
         for webseries,weights in a:
@@ -149,10 +187,44 @@ if tp in dataset.keys():
             b=True
         
 else:
-    print("Person not found in the dataset..please try again")
+    title="no"
+    data="no"
 
+if tp in datasetbook.keys():
+        a=recommendation_phase(datasetbook,tp)
+        if a != -1:
+            print("Recommendation Using User based Collaborative Filtering:  ")
+            
+            for webseries,weights in a:
+                print(webseries,'——>',weights)
+                if(b2==False):
+                    titlebook=webseries
+                    databook=weights
+                b2=True
+            
+else:
+    titlebook="no"
+    databook="no"
+
+if tp in datasetwhere.keys():
+        a=recommendation_phase(datasetwhere,tp)
+        if a != -1:
+            print("Recommendation Using User based Collaborative Filtering:  ")
+            for webseries,weights in a:
+                print(webseries,'——>',weights)
+                if(b3==False):
+                    titlewhere=webseries
+                    datawhere=weights
+                b3=True
+            
+else:
+    titlewhere="no"
+    datawhere="no"
 
 # In[ ]:
 print(title)
 print(data)
-
+print(titlebook)
+print(databook)
+print(titlewhere)
+print(datawhere)
